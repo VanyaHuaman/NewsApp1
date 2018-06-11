@@ -16,10 +16,11 @@
         android:gravity="center"
         android:textAllCaps="true"
         android:textStyle="bold"
-        tools:background="@android:color/holo_orange_light"
+        android:textColor="@android:color/white"
+        tools:background="@color/green"
         tools:textSize="16sp"
         tools:textStyle="bold"
-        tools:textColor="@android:color/black"
+        tools:textColor="@android:color/white"
         tools:text="Business"/>
 
 
