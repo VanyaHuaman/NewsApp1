@@ -53,11 +53,22 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         mProgressBar = findViewById(R.id.progress_bar);
 
-        LoaderManager loaderManager = getLoaderManager();
-        Log.e(LOG_TAG,"getLoaderManager Called");
+        if (hasConnection(this)) {
 
-        loaderManager.initLoader(ARTICLE_LOADER_ID, null, this);
-        Log.e(LOG_TAG,"initLoader Called");
+            LoaderManager loaderManager = getLoaderManager();
+            Log.e(LOG_TAG,"getLoaderManager Called");
+
+            loaderManager.initLoader(ARTICLE_LOADER_ID, null, this);
+            Log.e(LOG_TAG,"initLoader Called");
+
+        } else {
+            View loadingIndicator = findViewById(R.id.progress_bar);
+
+            loadingIndicator.setVisibility(View.GONE);
+
+            mEmptyStateTextView.setText(R.string.no_connection);
+        }
+
 
     }
 
@@ -72,8 +83,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                 getString(R.string.settings_order_by_default));
 
         Log.i("BUILDING: ","Section: "+section);
+
         String userKey = "&api-key=ef9f2bb6-df78-4fd6-8c3e-be20492824f5";
-        GUARDIAN_REQUEST_URL = GUARDIAN_REQUEST_URL+section+userKey;
+        String authorCall = "&show-tags=contributor";
+        GUARDIAN_REQUEST_URL = GUARDIAN_REQUEST_URL+section+userKey+authorCall;
 
         Log.i("BUILDING: ","URL: "+GUARDIAN_REQUEST_URL);
 

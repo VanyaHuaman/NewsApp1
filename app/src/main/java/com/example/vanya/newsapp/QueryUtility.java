@@ -118,7 +118,6 @@ public class QueryUtility {
 
             for (int i = 0; i < resultsArray.length(); i++) {
 
-                String count = Integer.toString(i);
 
                 JSONObject currentArticle = resultsArray.getJSONObject(i);
 
@@ -126,8 +125,21 @@ public class QueryUtility {
                 String title = currentArticle.getString("webTitle");
                 String date = currentArticle.getString("webPublicationDate");
                 String url = currentArticle.getString("webUrl");
+                String author = "No Author Found";
 
-                Article article = new Article(section, title, date, url);
+
+                JSONArray tagsArray = currentArticle.getJSONArray("tags");
+
+                if(!tagsArray.isNull(0)) {
+                    JSONObject tags = tagsArray.getJSONObject(0);
+
+
+                    if (tags.getString("webTitle") != null) {
+                        author = tags.getString("webTitle");
+                        Log.i("BUILDER: ", "author: " + author);
+                    }
+                }
+                Article article = new Article(section, title, date, url,author);
 
                 articles.add(article);
 

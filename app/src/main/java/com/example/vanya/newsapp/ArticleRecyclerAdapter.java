@@ -47,6 +47,11 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
         holder.title.setText(currentArticle.getArticleTitle());
         holder.date.setText(currentArticle.getPublishDate());
 
+        if(currentArticle.getAuthor()!="No Author Found"){
+            holder.author.setText(currentArticle.getAuthor());
+        }
+
+
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +79,7 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
         private TextView section;
         private TextView title;
         private TextView date;
+        private TextView author;
 
         public ViewHolder(View itemView){
             super(itemView);
@@ -81,6 +87,7 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
             title = itemView.findViewById(R.id.title_text_view);
             section = itemView.findViewById(R.id.section_text_view);
             date = itemView.findViewById(R.id.date_text_view);
+            author = itemView.findViewById(R.id.author_text_view);
         }
 
     }
