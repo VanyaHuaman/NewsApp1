@@ -3,14 +3,19 @@ package com.example.vanya.newsapp;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private TextView mEmptyStateTextView;
     private ArticleRecyclerAdapter mAdapter;
     private ProgressBar mProgressBar;
-    private static final String GUARDIAN_REQUEST_URL =
-            "https://content.guardianapis.com/search?q=debate&tag=politics/politics&from-date=2014-01-01&api-key=test";
+    private String GUARDIAN_REQUEST_URL =
+            "https://content.guardianapis.com/search?q=";
 
 
 
@@ -36,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mArticleRecycleView = (RecyclerView) findViewById(R.id.list);
+        mArticleRecycleView = findViewById(R.id.list);
 
         mAdapter = new ArticleRecyclerAdapter(this,0,new ArrayList<Article>());
 
@@ -56,12 +61,25 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     }
 
+
     @Override
     public Loader<List<Article>> onCreateLoader(int id, Bundle args) {
         Log.e(LOG_TAG,"On Create Loader called");
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String section = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default));
+
+        Log.i("BUILDING: ","Section: "+section);
+        String userKey = "&api-key=ef9f2bb6-df78-4fd6-8c3e-be20492824f5";
+        GUARDIAN_REQUEST_URL = GUARDIAN_REQUEST_URL+section+userKey;
+
+        Log.i("BUILDING: ","URL: "+GUARDIAN_REQUEST_URL);
 
         return new ArticleLoader(this, GUARDIAN_REQUEST_URL);
     }
+
 
 
 
@@ -114,6 +132,24 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                 activeNetwork.isConnectedOrConnecting();
 
         return isConnected;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

@@ -2,7 +2,6 @@ package com.example.vanya.newsapp;
 
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ViewDebug;
 
 import org.json.JSONArray;
 import org.json.JSONException;
