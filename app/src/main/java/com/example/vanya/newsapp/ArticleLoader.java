@@ -32,4 +32,6 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
         List<Article> articles = QueryUtility.fetchArticleData(mUrl);
         return articles;
     }
+
+
 }

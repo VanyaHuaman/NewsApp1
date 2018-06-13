@@ -3,6 +3,7 @@ package com.example.vanya.newsapp;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.preference.Preference;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -55,8 +56,8 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri earthquakeUri = Uri.parse(currentArticle.getUrl());
-                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
+                Uri articleUri = Uri.parse(currentArticle.getUrl());
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, articleUri);
                 Intent intent = new Intent(v.getContext(), MainActivity.class);
                 v.getContext().startActivity(websiteIntent);
             }
@@ -91,6 +92,7 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
         }
 
     }
+
 
     private int findColor(String section){
 

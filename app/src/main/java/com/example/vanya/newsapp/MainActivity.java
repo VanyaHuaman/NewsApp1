@@ -9,7 +9,9 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Article>>{
@@ -33,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private ProgressBar mProgressBar;
     private String GUARDIAN_REQUEST_URL =
             "https://content.guardianapis.com/search?q=";
-
+    private String section;
 
 
     @Override
@@ -68,8 +71,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
             mEmptyStateTextView.setText(R.string.no_connection);
         }
-
-
     }
 
 
@@ -78,11 +79,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         Log.e(LOG_TAG,"On Create Loader called");
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String section = sharedPrefs.getString(
+        section = sharedPrefs.getString(
                 getString(R.string.settings_order_by_key),
                 getString(R.string.settings_order_by_default));
 
-        Log.i("BUILDING: ","Section: "+section);
 
         String userKey = "&api-key=ef9f2bb6-df78-4fd6-8c3e-be20492824f5";
         String authorCall = "&show-tags=contributor";
@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     @Override
     public void onLoaderReset(Loader<List<Article>> loader) {
         Log.e(LOG_TAG,"on Loader reset called");
-
         mAdapter = new ArticleRecyclerAdapter(this,0,new ArrayList<Article>());
+        mArticleRecycleView.setAdapter(mAdapter);
     }
 
 
@@ -165,4 +165,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         return super.onOptionsItemSelected(item);
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
 }

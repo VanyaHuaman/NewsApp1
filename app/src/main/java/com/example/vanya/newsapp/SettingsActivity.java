@@ -1,7 +1,9 @@
 package com.example.vanya.newsapp;
 
 import android.app.Activity;
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -9,8 +11,15 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Window;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 
 public class SettingsActivity extends AppCompatActivity {
+
+    public static String setting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +38,10 @@ public class SettingsActivity extends AppCompatActivity {
             final Preference section = findPreference(getString(R.string.settings_order_by_key));
             bindPreferenceSummaryToValue(section);
 
-
         }
+
+
+
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
 
@@ -46,6 +57,8 @@ public class SettingsActivity extends AppCompatActivity {
                 preference.setSummary(stringValue);
             }
 
+
+
             return true;
         }
 
@@ -60,5 +73,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
 
+        LoaderManager loaderManager = getLoaderManager();
+
+    }
 }
