@@ -8,6 +8,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -35,9 +36,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     private ArticleRecyclerAdapter mAdapter;
     private ProgressBar mProgressBar;
     private String GUARDIAN_REQUEST_URL =
-            "https://content.guardianapis.com/search?q=";
+            "http://content.guardianapis.com/search";
     private String section;
 
+    private boolean isInitialLoad = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,68 +47,73 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         setContentView(R.layout.activity_main);
 
         mArticleRecycleView = findViewById(R.id.list);
-
         mAdapter = new ArticleRecyclerAdapter(this,0,new ArrayList<Article>());
-
         mArticleRecycleView.setAdapter(mAdapter);
-
         mArticleRecycleView.setLayoutManager(new LinearLayoutManager(this));
 
-        mEmptyStateTextView = findViewById(R.id.empty);
 
+        mEmptyStateTextView = findViewById(R.id.empty);
         mProgressBar = findViewById(R.id.progress_bar);
 
         if (hasConnection(this)) {
-
             LoaderManager loaderManager = getLoaderManager();
             Log.e(LOG_TAG,"getLoaderManager Called");
-
             loaderManager.initLoader(ARTICLE_LOADER_ID, null, this);
             Log.e(LOG_TAG,"initLoader Called");
-
         } else {
             View loadingIndicator = findViewById(R.id.progress_bar);
-
             loadingIndicator.setVisibility(View.GONE);
-
             mEmptyStateTextView.setText(R.string.no_connection);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(isInitialLoad){
+            isInitialLoad = false;
+        }else{
+            getLoaderManager().restartLoader(ARTICLE_LOADER_ID,null,this);
         }
     }
 
 
+
+
+
     @Override
-    public Loader<List<Article>> onCreateLoader(int id, Bundle args) {
-        Log.e(LOG_TAG,"On Create Loader called");
+    public Loader<List<Article>> onCreateLoader(int i, Bundle bundle) {
+        Log.i("BUILDING: ","On Create Loader called");
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         section = sharedPrefs.getString(
                 getString(R.string.settings_order_by_key),
                 getString(R.string.settings_order_by_default));
 
+        String userKey = "ef9f2bb6-df78-4fd6-8c3e-be20492824f5";
+        String authorCall = "contributor";
 
-        String userKey = "&api-key=ef9f2bb6-df78-4fd6-8c3e-be20492824f5";
-        String authorCall = "&show-tags=contributor";
-        GUARDIAN_REQUEST_URL = GUARDIAN_REQUEST_URL+section+userKey+authorCall;
+        Uri baseUri = Uri.parse(GUARDIAN_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
 
-        Log.i("BUILDING: ","URL: "+GUARDIAN_REQUEST_URL);
+        uriBuilder.appendQueryParameter("q",section);
+        uriBuilder.appendQueryParameter("api-key",userKey);
+        uriBuilder.appendQueryParameter("show-tags",authorCall);
 
-        return new ArticleLoader(this, GUARDIAN_REQUEST_URL);
+        Log.i("BUILDING: ","URL: "+uriBuilder.toString());
+
+        return new ArticleLoader(this, uriBuilder.toString());
     }
-
-
-
 
     @Override
     public void onLoadFinished(Loader<List<Article>> loader, List<Article> data) {
+
         if(hasConnection(this)){
             mEmptyStateTextView.setText(R.string.no_articles);
             if (data != null && !data.isEmpty()) {
 
                 ArrayList<Article> passArray = new ArrayList<Article>(data);
-
-                String passArraySize = Integer.toString(passArray.size());
-                Log.i("BUILDING:","passArray size: "+passArraySize);
-
                 mAdapter = new ArticleRecyclerAdapter(this,0,passArray);
                 mArticleRecycleView.setAdapter(mAdapter);
                 mEmptyStateTextView.setVisibility(View.INVISIBLE);
@@ -120,18 +127,18 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
             mEmptyStateTextView.setText(R.string.no_connection);
         }
 
-
-        Log.e(LOG_TAG,"on Load Finished Called");
         mProgressBar.setVisibility(View.GONE);
 
-
+        Log.i("BUILDING: ","onLoadFinshed ran");
     }
 
     @Override
     public void onLoaderReset(Loader<List<Article>> loader) {
         Log.e(LOG_TAG,"on Loader reset called");
         mAdapter = new ArticleRecyclerAdapter(this,0,new ArrayList<Article>());
-        mArticleRecycleView.setAdapter(mAdapter);
+
+        Log.i("BUILDING: ","onLoaderReset Ran");
+
     }
 
 
@@ -160,15 +167,11 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         if (id == R.id.action_settings) {
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingsIntent);
+
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
 }
